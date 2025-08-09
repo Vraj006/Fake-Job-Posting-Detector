@@ -13,7 +13,7 @@ import os
 app = Flask(__name__)
 CORS(app, origins=[
     "http://localhost:3000",  # Local development
-    "https://your-actual-frontend-url.onrender.com",  # Replace with your actual frontend URL
+    "https://fake-job-posting-detector.onrender.com",  # Replace with your actual frontend URL
 ])
 
 # Global variables for model components
