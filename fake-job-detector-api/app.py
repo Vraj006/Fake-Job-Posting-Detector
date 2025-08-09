@@ -8,7 +8,11 @@ import scipy.sparse as sp
 import numpy as np
 from datetime import datetime
 import os
+import logging
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app, origins=[
@@ -27,10 +31,43 @@ numerical_features = None
 def load_model():
     """Load the trained model pipeline"""
     global model_pipeline, svm_model, tfidf, scaler, numerical_features
+     
     
+    # try:
+    #     # Load the model pipeline
+    #     model_path = 'fake_job_detector_v1.pkl'
+    #     model_pipeline = joblib.load(model_path)
+        
+    #     # Extract components
+    #     svm_model = model_pipeline['svm_model']
+    #     tfidf = model_pipeline['tfidf_vectorizer']
+    #     scaler = model_pipeline['scaler']
+    #     numerical_features = model_pipeline['numerical_features']
+        
+    #     print("✅ Model loaded successfully!")
+    #     print(f"📊 Model trained on: {model_pipeline['training_date']}")
+    #     print(f"🎯 Model accuracy: {model_pipeline['performance_metrics']['accuracy']:.2%}")
+        
+    #     return True
+        
+    # except Exception as e:
+    #     print(f"❌ Error loading model: {str(e)}")
+    #     return False
+
     try:
-        # Load the model pipeline
+        # Check if model file exists
         model_path = 'fake_job_detector_v1.pkl'
+        if not os.path.exists(model_path):
+            logger.error(f"Model file {model_path} not found in directory: {os.getcwd()}")
+            logger.info(f"Files in current directory: {os.listdir('.')}")
+            return False
+        
+        # Check file size
+        file_size = os.path.getsize(model_path) / (1024 * 1024)  # MB
+        logger.info(f"Model file size: {file_size:.2f} MB")
+        
+        # Load the model pipeline
+        logger.info("Loading model pipeline...")
         model_pipeline = joblib.load(model_path)
         
         # Extract components
@@ -39,14 +76,16 @@ def load_model():
         scaler = model_pipeline['scaler']
         numerical_features = model_pipeline['numerical_features']
         
-        print("✅ Model loaded successfully!")
-        print(f"📊 Model trained on: {model_pipeline['training_date']}")
-        print(f"🎯 Model accuracy: {model_pipeline['performance_metrics']['accuracy']:.2%}")
+        logger.info("✅ Model loaded successfully!")
+        logger.info(f"📊 Model trained on: {model_pipeline['training_date']}")
+        logger.info(f"🎯 Model accuracy: {model_pipeline['performance_metrics']['accuracy']:.2%}")
         
         return True
         
     except Exception as e:
-        print(f"❌ Error loading model: {str(e)}")
+        logger.error(f"❌ Error loading model: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 # Text cleaning function (same as training)
